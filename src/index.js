@@ -20,7 +20,7 @@ const PRODUCT_SERVICE_URL = process.env.PRODUCT_SERVICE_URL || 'http://localhost
 
 // Health check
 app.get('/health', (req, res) => {
-  res.status(200).send('OK');
+  res.status(200).json({ status: 'OK', version: '2.0-phase6' });
 });
 
 // Get all orders
