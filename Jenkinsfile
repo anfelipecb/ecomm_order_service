@@ -56,6 +56,17 @@ pipeline {
             }
         }
 
+        stage('Validate Manifests') {
+            when {
+                expression { env.PIPELINE_ENV != 'build' }
+            }
+            steps {
+                script {
+                    validateK8sManifests(['deployment.yaml', 'service.yaml'])
+                }
+            }
+        }
+
         stage('Deploy') {
             when {
                 expression { env.PIPELINE_ENV != 'build' }
