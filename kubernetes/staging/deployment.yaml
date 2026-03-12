@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecomm-order-service
+  namespace: ecomm-staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecomm-order-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: ecomm-order-service
+    spec:
+      containers:
+        - name: order-service
+          image: PLACEHOLDER_IMAGE
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: ecomm-config
+            - secretRef:
+                name: ecomm-db-secret
+          ports:
+            - containerPort: 3002
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 5
+            periodSeconds: 5
