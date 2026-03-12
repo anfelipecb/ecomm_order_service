@@ -2,10 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const { Pool } = require('pg');
+const prom = require('prom-client');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+const register = new prom.Registry();
+prom.collectDefaultMetrics({ register });
 
 // Database connection
 const pool = new Pool({
@@ -21,6 +25,12 @@ const PRODUCT_SERVICE_URL = process.env.PRODUCT_SERVICE_URL || 'http://localhost
 // Health check
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', version: '2.0-phase6' });
+});
+
+// Prometheus metrics
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
 });
 
 // Get all orders
